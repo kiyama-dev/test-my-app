@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f0f0f0; /* 薄いグレー */
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.y2k-container {
+  @apply bg-pink-500 text-white;
+}
+
+.y2k-button {
+  @apply bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full px-4 py-2;
+}
+
+.ios-memo-container {
+  @apply bg-white text-gray-900;
+}
+
+.ios-memo-input {
+  @apply border border-gray-300 rounded px-3 py-2;
+}
+
+.ios-memo-button {
+  @apply bg-gray-200 rounded px-4 py-2 text-gray-900;
+}
+
+h2.inputs {
+  background-color: #f0f0f0; /* 薄いグレー */
+}
