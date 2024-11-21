@@ -51,9 +51,11 @@ const TodoList: React.FC = () => {
   const isTodoExpired = (todo: Todo) => {
     const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
     const now = new Date();
-    return deadline <= now && !todo.completed;
+    const isExpired = deadline <= now && !todo.completed; 
+    //console.log('isTodoExpired:', isExpired); // 戻り値を出力
+    return isExpired;
   };
-
+  
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (newTodoContent.trim() === '') {
