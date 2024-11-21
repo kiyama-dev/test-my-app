@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { checkExpiredTodos } from './checkExpiredTodos';
 
 interface Todo {
   id: number;
@@ -24,8 +25,8 @@ const TodoList: React.FC = () => {
     setIsLoading(false);
 
     // todosの状態が更新された後に期限切れタスクをチェック
-    checkExpiredTodos(); 
-  }, []);
+    checkExpiredTodos(todos); 
+  }, []); 
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -39,22 +40,29 @@ const TodoList: React.FC = () => {
     }
   }, [todos]);
 
-  const checkExpiredTodos = () => {
-    const now = new Date();
-    const hasExpiredTodos = todos.some((todo) => {
-      const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
-      return deadline <= now && !todo.completed;
-    });
-
-    if (hasExpiredTodos) {
-      alert('期限切れのタスクがあります！'); 
-    }
-  };
 
   const isTodoExpired = (todo: Todo) => {
     const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
     const now = new Date();
     return deadline <= now && !todo.completed;
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (newTodoContent.trim() === '') {
+      return;
+    }
+    const newTodo: Todo = {
+      id: Date.now(),
+      content: newTodoContent,
+      deadline: newTodoDeadline,
+      deadlineTime: newTodoDeadlineTime,
+      completed: false,
+    };
+    setTodos([...todos, newTodo]);
+    setNewTodoContent('');
+    setNewTodoDeadline(new Date().toISOString().slice(0, 10));
+    setNewTodoDeadlineTime('12:00');
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,22 +77,8 @@ const TodoList: React.FC = () => {
     setNewTodoDeadlineTime(event.target.value);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (newTodoContent.trim() === '') return;
-
-    const newTodo: Todo = {
-      id: Date.now(),
-      content: newTodoContent,
-      deadline: newTodoDeadline,
-      deadlineTime: newTodoDeadlineTime,
-      completed: false,
-    };
-
-    setTodos([...todos, newTodo]);
-    setNewTodoContent('');
-    setNewTodoDeadline(new Date().toISOString().slice(0, 10));
-    setNewTodoDeadlineTime('12:00');
+  const handleDeleteTodo = (id: number) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   const handleToggleComplete = (id: number) => {
@@ -93,10 +87,6 @@ const TodoList: React.FC = () => {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
-  };
-
-  const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   return (
@@ -143,7 +133,7 @@ const TodoList: React.FC = () => {
           {todos.map((todo) => (
             <li
               key={todo.id}
-              className={`flex items-center justify-between p-3 bg-white border rounded-lg ${isTodoExpired(todo) ? 'bg-red-100' : ''}`}
+              className={`flex items-center justify-between p-3 bg-white border rounded-lg ${isTodoExpired(todo) ? 'bg-red-100' : ''}`} 
             >
               <div className="flex items-center gap-3">
                 <input
