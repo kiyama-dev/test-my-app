@@ -22,11 +22,40 @@ const TodoList: React.FC = () => {
       setTodos(JSON.parse(storedTodos));
     }
     setIsLoading(false);
+
+    // todosの状態が更新された後に期限切れタスクをチェック
+    checkExpiredTodos(); 
   }, []);
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
+
+  // チェックが全て完了したタイミングでのみメッセージを表示
+  useEffect(() => {
+    const allCompleted = todos.every((todo) => todo.completed);
+    if (todos.length > 0 && allCompleted) {
+      alert('おめでとうございます！全てのタスクが完了しました！');
+    }
+  }, [todos]);
+
+  const checkExpiredTodos = () => {
+    const now = new Date();
+    const hasExpiredTodos = todos.some((todo) => {
+      const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
+      return deadline <= now && !todo.completed;
+    });
+
+    if (hasExpiredTodos) {
+      alert('期限切れのタスクがあります！'); 
+    }
+  };
+
+  const isTodoExpired = (todo: Todo) => {
+    const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
+    const now = new Date();
+    return deadline <= now && !todo.completed;
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewTodoContent(event.target.value);
@@ -114,7 +143,7 @@ const TodoList: React.FC = () => {
           {todos.map((todo) => (
             <li
               key={todo.id}
-              className="flex items-center justify-between p-3 bg-white border rounded-lg"
+              className={`flex items-center justify-between p-3 bg-white border rounded-lg ${isTodoExpired(todo) ? 'bg-red-100' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <input
