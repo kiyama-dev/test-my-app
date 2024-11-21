@@ -1,11 +1,9 @@
-export const checkExpiredTodos = (todos: any[]) => {
+import { Todo } from './TodoList';
+
+export const checkExpiredTodos = (todos: Todo[]): boolean => {
   const now = new Date();
-  const hasExpiredTodos = todos.some((todo: any) => {
+  return todos.some((todo: Todo) => {
     const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
     return deadline <= now && !todo.completed;
   });
-
-  if (hasExpiredTodos) {
-    alert('期限切れのタスクがあります！'); 
-  }
 }; 

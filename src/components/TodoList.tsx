@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { checkExpiredTodos } from './checkExpiredTodos';
 
-interface Todo {
+export interface Todo {
   id: number;
   content: string;
   deadline: string;
@@ -16,6 +16,7 @@ const TodoList: React.FC = () => {
   const [newTodoDeadline, setNewTodoDeadline] = useState(new Date().toISOString().slice(0, 10));
   const [newTodoDeadlineTime, setNewTodoDeadlineTime] = useState('12:00');
   const [isLoading, setIsLoading] = useState(true);
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     const storedTodos = localStorage.getItem('todos');
@@ -25,7 +26,8 @@ const TodoList: React.FC = () => {
     setIsLoading(false);
 
     // todosの状態が更新された後に期限切れタスクをチェック
-    checkExpiredTodos(todos); 
+    const hasExpired = checkExpiredTodos(todos);
+    setIsExpired(hasExpired); // 期限切れタスクがあるかどうかを状態に反映
   }, []); 
 
   useEffect(() => {
@@ -40,6 +42,11 @@ const TodoList: React.FC = () => {
     }
   }, [todos]);
 
+  useEffect(() => {
+    if (isExpired) {
+      alert('期限切れのタスクがあります！');
+    }
+  }, [isExpired]);
 
   const isTodoExpired = (todo: Todo) => {
     const deadline = new Date(`${todo.deadline}T${todo.deadlineTime}`);
@@ -133,7 +140,7 @@ const TodoList: React.FC = () => {
           {todos.map((todo) => (
             <li
               key={todo.id}
-              className={`flex items-center justify-between p-3 bg-white border rounded-lg ${isTodoExpired(todo) ? 'bg-red-100' : ''}`} 
+              className={`flex items-center justify-between p-3 bg-white border rounded-lg ${isTodoExpired(todo) ? 'bg-red-100' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <input
